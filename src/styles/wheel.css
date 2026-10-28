@@ -1,0 +1,442 @@
+/* Rueda radial: disco de cristal, pétalos, hueco central y esfera. */
+
+.wheel {
+  position: fixed;
+  inset: 0;
+  outline: none;
+  color: var(--ink);
+  --d: 300px;
+}
+
+.wheel[data-mode='hidden'],
+.wheel[data-mode='ready'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.wheel-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.wheel-stage {
+  position: absolute;
+  width: var(--d);
+  height: var(--d);
+  left: calc((100vw - var(--d)) / 2);
+  top: calc((100vh - var(--d)) / 2);
+}
+
+/* Sombra suave bajo el disco (elemento propio para no recalcularla en cada fotograma). */
+.wheel-shadow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    0 14px 30px rgb(var(--shadow-color) / calc(var(--shadow-strength) * 0.9)),
+    0 3px 10px rgb(var(--shadow-color) / calc(var(--shadow-strength) * 0.45));
+  transform-origin: 50% 50%;
+}
+
+/* Cristal: el escritorio real desenfocado y ligeramente ampliado, como a través de una lente. */
+.wheel-glass {
+  position: absolute;
+  inset: 0;
+  clip-path: circle(50% at 50% 50%);
+  overflow: hidden;
+}
+
+.wheel-backdrop {
+  position: absolute;
+  max-width: none;
+  filter: blur(14px) saturate(1.3);
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+.wheel-tint {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 90% at 30% 12%, rgb(255 255 255 / 0.14), transparent 55%),
+    var(--glass-tint);
+}
+
+.wheel[data-fallback='true'] .wheel-tint {
+  background:
+    radial-gradient(120% 90% at 30% 12%, rgb(255 255 255 / 0.18), transparent 55%),
+    var(--glass-tint-solid);
+}
+
+/* Grano muy sutil: evita el aspecto plástico del degradado. */
+.wheel-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Canto del disco: brillo arriba, sombra abajo y un filo fino que lo separa de cualquier fondo. */
+.wheel-rim {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  box-shadow:
+    inset 0 1px 0 var(--edge-hi),
+    inset 0 -1px 0 rgb(0 0 0 / 0.06),
+    inset 0 0 0 1px rgb(255 255 255 / 0.16),
+    0 0 0 0.5px var(--edge-lo);
+}
+
+.wheel-body {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+}
+
+/* Pétalos */
+.petal {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  transition:
+    transform var(--spring-hover-duration, 260ms) var(--spring-hover, ease-out),
+    opacity 160ms ease-out;
+}
+
+.wheel[data-hovering='true'] .petal[data-active='false'] {
+  opacity: 0.82;
+}
+
+.petal[data-active='true'] {
+  transform: translate(var(--lift-x), var(--lift-y)) scale(1.035);
+}
+
+.petal[data-active='true'][data-pressed='true'] {
+  transform: translate(var(--lift-x), var(--lift-y)) scale(1.005);
+}
+
+.petal-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: var(--surface-lift);
+  transition: filter 180ms ease-out;
+}
+
+.petal[data-active='true'] .petal-svg {
+  filter: var(--surface-lift-strong);
+}
+
+.petal-shape {
+  fill: var(--surface);
+  stroke: var(--surface-stroke);
+  stroke-width: 1;
+  transition:
+    fill 180ms ease-out,
+    stroke 180ms ease-out;
+}
+
+.petal[data-active='true'] .petal-shape {
+  fill: var(--surface-strong);
+  stroke: var(--surface-stroke-strong);
+}
+
+.petal[data-focus-visible='true'] .petal-shape {
+  stroke: var(--focus);
+  stroke-width: 1.75;
+}
+
+.petal-sheen {
+  fill: url(#efc-petal-sheen);
+  opacity: 0.55;
+  transition: opacity 180ms ease-out;
+}
+
+[data-theme='dark'] .petal-sheen {
+  opacity: 0.22;
+}
+
+.petal[data-active='true'] .petal-sheen {
+  opacity: 0.9;
+}
+
+[data-theme='dark'] .petal[data-active='true'] .petal-sheen {
+  opacity: 0.35;
+}
+
+.petal-marker {
+  fill: var(--ink-faint);
+}
+
+.petal-label {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transform: translate(-50%, -50%) translate(var(--px, 0px), var(--py, 0px));
+  transition: transform 140ms ease-out;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.petal-icon {
+  display: block;
+  opacity: 0.86;
+  transition:
+    transform var(--spring-hover-duration, 260ms) var(--spring-hover, ease-out),
+    opacity 160ms ease-out;
+}
+
+.petal[data-active='true'] .petal-icon {
+  opacity: 1;
+  transform: scale(1.1) translateY(-1px);
+}
+
+.petal-text {
+  font-family: var(--font-small);
+  font-size: 11px;
+  line-height: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.petal-caption {
+  font-family: var(--font-small);
+  font-size: 8.5px;
+  line-height: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: -2px;
+}
+
+/* Pétalo de grupo sin texto principal («Herramientas»): con el estilo del texto pequeño. */
+.petal[data-caption-only='true'] .petal-text {
+  font-size: 8px;
+  line-height: 10px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.petal[data-kind='more'] .petal-text,
+.petal[data-kind='back'] .petal-text {
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink-soft);
+}
+
+/* Hueco central y esfera */
+.wheel-well {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--d) * 0.41);
+  height: calc(var(--d) * 0.41);
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: var(--well);
+  box-shadow:
+    inset 0 1px 3px rgb(0 0 0 / 0.14),
+    inset 0 -1px 0 rgb(255 255 255 / 0.25);
+  pointer-events: none;
+}
+
+.orb {
+  position: absolute;
+  left: calc(50% - var(--d) * 0.175);
+  top: calc(50% - var(--d) * 0.175);
+  width: calc(var(--d) * 0.35);
+  height: calc(var(--d) * 0.35);
+  border-radius: 50%;
+  transform-origin: 50% 50%;
+  background:
+    radial-gradient(circle at 34% 24%, var(--orb-hi), var(--orb-lo) 68%),
+    var(--surface);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.75),
+    inset 0 -2px 6px rgb(0 0 0 / 0.06),
+    0 6px 14px rgb(var(--shadow-color) / calc(var(--shadow-strength) * 0.5)),
+    0 0 0 0.5px var(--edge-lo);
+  pointer-events: none;
+}
+
+[data-theme='dark'] .orb {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.24),
+    inset 0 -2px 6px rgb(0 0 0 / 0.2),
+    0 6px 14px rgb(0 0 0 / 0.35),
+    0 0 0 0.5px var(--edge-lo);
+}
+
+.orb-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  transition:
+    opacity 150ms ease-out,
+    transform var(--spring-hover-duration, 260ms) var(--spring-hover, ease-out);
+}
+
+.orb[data-show-target='true'] .orb-source,
+.orb[data-show-target='false'] .orb-target {
+  opacity: 0;
+  transform: scale(0.92);
+}
+
+.orb-badge {
+  font-family: var(--font-small);
+  font-size: 9.5px;
+  line-height: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+}
+
+.orb-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11.5px;
+  line-height: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.orb-name-line {
+  white-space: nowrap;
+}
+
+.orb-size {
+  margin-top: 4px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-family: var(--font-small);
+  font-size: 9.5px;
+  line-height: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  background: var(--well);
+}
+
+.orb-from {
+  font-family: var(--font-small);
+  font-size: 9.5px;
+  line-height: 12px;
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.orb-target-label {
+  font-family: var(--font-display);
+  font-size: 23px;
+  line-height: 26px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.orb-target-label[data-long='true'] {
+  font-size: 16px;
+}
+
+.orb-target-detail {
+  max-width: 82%;
+  font-size: 9.5px;
+  line-height: 12px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Aviso discreto bajo la rueda */
+.wheel-notice {
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  max-width: calc(100vw - 24px);
+  transform: translateX(-50%);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ink);
+  background: var(--glass-tint-solid);
+  box-shadow:
+    inset 0 0.5px 0 var(--edge-hi),
+    0 0 0 0.5px var(--edge-lo),
+    0 4px 10px rgb(0 0 0 / 0.12);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .petal,
+  .petal-label,
+  .petal-icon,
+  .orb-face {
+    transition-duration: 0ms !important;
+  }
+  .petal[data-active='true'] {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .wheel-backdrop,
+  .wheel-grain,
+  .petal-sheen {
+    display: none;
+  }
+  .wheel-rim {
+    border: 1px solid CanvasText;
+  }
+  .petal-shape {
+    forced-color-adjust: none;
+  }
+}
+
+/*
+ * La rueda es más transparente que los avisos: menos velo sobre el escritorio desenfocado y pétalos
+ * más ligeros. La esfera central conserva algo más de cuerpo porque lleva el texto principal.
+ * (En contraste alto de Windows mandan los colores del sistema.)
+ */
+@media (forced-colors: none) {
+  .wheel[data-theme='light'] {
+    --glass-tint: rgb(234 235 240 / 0.3);
+    --surface: rgb(255 255 255 / 0.3);
+    --surface-strong: rgb(255 255 255 / 0.9);
+    --surface-stroke: rgb(255 255 255 / 0.72);
+    --orb-hi: rgb(255 255 255 / 0.9);
+    --orb-lo: rgb(255 255 255 / 0.42);
+    --well: rgb(0 0 0 / 0.06);
+  }
+
+  .wheel[data-theme='dark'] {
+    --glass-tint: rgb(22 22 26 / 0.26);
+    --surface: rgb(255 255 255 / 0.06);
+    --surface-strong: rgb(255 255 255 / 0.22);
+    --surface-stroke: rgb(255 255 255 / 0.12);
+    --orb-hi: rgb(255 255 255 / 0.18);
+    --orb-lo: rgb(255 255 255 / 0.04);
+    --well: rgb(0 0 0 / 0.18);
+  }
+}

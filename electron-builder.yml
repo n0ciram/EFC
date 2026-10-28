@@ -1,0 +1,96 @@
+# Configuración del instalador de Windows (electron-builder).
+# Antes de empaquetar, `npm run prepare:win` deja listos el ayudante, los binarios de Windows y FFmpeg.
+appId: es.efc.easyfileconverter
+productName: EFC
+copyright: Copyright © 2026 n0ciram
+directories:
+  output: release
+  buildResources: resources/build
+
+files:
+  - dist/electron/**
+  - dist/renderer/**
+  - package.json
+  - "!**/*.map"
+  # Binarios de otras plataformas (el paquete es solo para Windows x64).
+  - "!node_modules/@img/sharp-linux*/**"
+  - "!node_modules/@img/sharp-libvips-linux*/**"
+  - "!node_modules/@img/sharp-darwin*/**"
+  - "!node_modules/@img/sharp-libvips-darwin*/**"
+  - "!node_modules/@napi-rs/canvas-linux*/**"
+  - "!node_modules/@napi-rs/canvas-darwin*/**"
+  # pdf.js: solo se usa la compilación «legacy» y sus datos (fuentes, cmaps, wasm, perfiles ICC).
+  - "!node_modules/pdfjs-dist/{build,web,types,image_decoders}/**"
+  - "!node_modules/pdfjs-dist/legacy/{web,image_decoders}/**"
+  - "!node_modules/pdfjs-dist/legacy/build/*.min.mjs"
+  - "!node_modules/pdfjs-dist/legacy/build/pdf.sandbox*"
+  - "!node_modules/**/{README,CHANGELOG,HISTORY}*.md"
+  - "!node_modules/**/*.d.{ts,mts,cts}"
+
+asar: true
+# Sin publicación ni archivos de actualización automática.
+publish: null
+# Los módulos nativos y los datos de pdf.js deben existir como archivos reales.
+asarUnpack:
+  - node_modules/sharp/**
+  - node_modules/@img/**
+  - node_modules/@napi-rs/**
+  - node_modules/pdfjs-dist/**
+
+extraResources:
+  - from: resources/bin/efc-helper.exe
+    to: helper/efc-helper.exe
+  - from: electron/windows/helper/EfcHelper.cs
+    to: helper/EfcHelper.cs
+  - from: electron/windows/helper/efc-helper.ps1
+    to: helper/efc-helper.ps1
+  - from: electron/conversion/adapters/efc-office.ps1
+    to: office/efc-office.ps1
+  - from: resources/icons
+    to: icons
+    filter: ["*.ico", "*.png"]
+  - from: resources/licenses
+    to: licenses
+  - from: resources/fonts
+    to: fonts
+  - from: build/ffmpeg/win32-x64
+    to: ffmpeg
+
+# Solo se conservan las traducciones de Chromium necesarias (reduce el tamaño).
+electronLanguages:
+  - es
+  - en-US
+
+npmRebuild: false
+nodeGypRebuild: false
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icons/icon.ico
+  executableName: EFC
+  requestedExecutionLevel: asInvoker
+
+nsis:
+  # Instalación de un clic por usuario: no requiere permisos de administrador.
+  oneClick: true
+  perMachine: false
+  allowElevation: false
+  createDesktopShortcut: false
+  createStartMenuShortcut: true
+  shortcutName: EFC
+  runAfterFinish: true
+  deleteAppDataOnUninstall: false
+  installerIcon: resources/icons/icon.ico
+  uninstallerIcon: resources/icons/icon.ico
+  uninstallDisplayName: EFC — Easy File Converter
+  artifactName: EFC-Setup-${version}.${ext}
+  # Al empezar se elige el idioma (Español o English): el instalador sale en ese idioma y EFC
+  # arranca con él (installer.nsh deja la elección en installer-language.txt).
+  installerLanguages:
+    - es_ES
+    - en_US
+  multiLanguageInstaller: true
+  displayLanguageSelector: true

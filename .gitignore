@@ -1,0 +1,10 @@
+node_modules/
+dist/
+release/
+/build/
+# Notas de trabajo locales del asistente (no forman parte del proyecto)
+CLAUDE.md
+logs/
+*.log
+.DS_Store
+Thumbs.db

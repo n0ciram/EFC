@@ -1,0 +1,431 @@
+/* Panel de ajustes: el mismo cristal neutro de la rueda y los avisos, sin colores de acento. */
+
+[data-theme='light'] {
+  --knob: rgb(255 255 255);
+  --group: rgb(255 255 255 / 0.36);
+  --divider: rgb(0 0 0 / 0.07);
+}
+
+[data-theme='dark'] {
+  --knob: rgb(28 28 32);
+  --group: rgb(255 255 255 / 0.06);
+  --divider: rgb(255 255 255 / 0.08);
+}
+
+.settings-root {
+  position: fixed;
+  inset: 0;
+  color: var(--ink);
+}
+
+/* El margen de 20 px deja sitio a la sombra (MARGIN en SettingsPanel.tsx). */
+.settings-card {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 20px;
+  max-height: calc(100% - 40px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  isolation: isolate;
+  outline: none;
+  box-shadow:
+    0 22px 46px rgb(var(--shadow-color) / calc(var(--shadow-strength) * 0.95)),
+    0 3px 10px rgb(var(--shadow-color) / calc(var(--shadow-strength) * 0.4)),
+    0 0 0 0.5px var(--edge-lo);
+}
+
+.settings-glass {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 var(--edge-hi),
+    inset 0 0 0 1px rgb(255 255 255 / 0.14);
+}
+
+.settings-backdrop {
+  position: absolute;
+  max-width: none;
+  filter: blur(18px) saturate(1.25);
+  pointer-events: none;
+}
+
+.settings-tint {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.14), transparent 40%), var(--glass-tint);
+}
+
+.settings-card[data-fallback='true'] .settings-tint {
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.12), transparent 40%), var(--glass-tint-solid);
+}
+
+.settings-content {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ink-faint) transparent;
+}
+
+.settings-inner {
+  padding: 16px 16px 14px;
+}
+
+/* Cabecera */
+.settings-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 2px 2px 12px 4px;
+}
+
+.settings-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 600;
+}
+
+.settings-version {
+  margin: 1px 0 0;
+  font-family: var(--font-small);
+  font-size: 11px;
+  color: var(--ink-faint);
+}
+
+.settings-close {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -2px -2px 0 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink-soft);
+  transition:
+    background 140ms ease-out,
+    color 140ms ease-out;
+}
+
+.settings-close:hover {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* Secciones: grupos de filas sobre una capa de cristal algo más clara. */
+.settings-section + .settings-section {
+  margin-top: 14px;
+}
+
+.settings-section-title {
+  margin: 0 0 6px 6px;
+  font-family: var(--font-small);
+  font-size: 10.5px;
+  line-height: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.settings-group {
+  border-radius: 14px;
+  background: var(--group);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.12),
+    0 0 0 0.5px var(--edge-lo);
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 46px;
+  box-sizing: border-box;
+  padding: 9px 12px;
+}
+
+.settings-row + .settings-row {
+  border-top: 1px solid var(--divider);
+}
+
+.settings-row[data-stacked='true'] {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  padding-bottom: 11px;
+}
+
+.settings-row[data-stacked='true'] .settings-control {
+  display: block;
+  width: 100%;
+}
+
+.settings-row[data-disabled='true'] .settings-label,
+.settings-row[data-disabled='true'] .settings-control {
+  opacity: 0.5;
+}
+
+.settings-row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.settings-label {
+  font-size: 13px;
+  line-height: 17px;
+  font-weight: 500;
+}
+
+.settings-hint {
+  font-family: var(--font-small);
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--ink-soft);
+}
+
+.settings-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  font-family: var(--font-small);
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.settings-error svg {
+  flex: none;
+  margin-top: 0.5px;
+}
+
+.settings-control {
+  flex: none;
+  display: flex;
+  align-items: center;
+}
+
+/* Botones de la interfaz */
+.settings-root button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.settings-root button:disabled {
+  cursor: default;
+}
+
+.settings-root :focus-visible {
+  outline: 1.75px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Atajo: una «tecla» que se pulsa para grabar uno nuevo. */
+.settings-keycap {
+  min-width: 112px;
+  height: 30px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 9px;
+  background: var(--surface);
+  box-shadow:
+    inset 0 1px 0 var(--edge-hi),
+    inset 0 -1px 0 rgb(0 0 0 / 0.08),
+    0 0 0 0.5px var(--edge-lo);
+  font-family: var(--font-small) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: background 140ms ease-out;
+}
+
+.settings-keycap:hover {
+  background: var(--surface-strong);
+}
+
+.settings-keycap[data-recording='true'] {
+  background: var(--surface-strong);
+  animation: settings-listening 1.2s ease-in-out infinite;
+}
+
+@keyframes settings-listening {
+  50% {
+    box-shadow:
+      inset 0 1px 0 var(--edge-hi),
+      0 0 0 3px var(--track);
+  }
+}
+
+/* Interruptor monocromo */
+.settings-switch {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 11px;
+  background: var(--track);
+  box-shadow: inset 0 0 0 1px var(--edge-lo);
+  transition: background 160ms ease-out;
+}
+
+.settings-switch[aria-checked='true'] {
+  background: var(--fill);
+}
+
+.settings-switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--knob);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+  transition: transform var(--spring-hover-duration, 220ms) var(--spring-hover, ease-out);
+}
+
+[data-theme='dark'] .settings-switch[aria-checked='false'] .settings-switch-knob {
+  background: rgb(255 255 255 / 0.85);
+}
+
+.settings-switch[aria-checked='true'] .settings-switch-knob {
+  transform: translateX(18px);
+}
+
+/* Control segmentado: a todo el ancho bajo el texto, o compacto a la derecha de la fila. */
+.settings-row[data-stacked='false'] .settings-segmented {
+  width: 168px;
+}
+
+.settings-segmented {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--well);
+}
+
+.settings-segment {
+  flex: 1;
+  min-width: 0;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  padding: 0 6px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  font-family: var(--font-small) !important;
+  font-size: 12px !important;
+  font-weight: 600;
+  color: var(--ink-soft) !important;
+  white-space: nowrap;
+  transition:
+    background 140ms ease-out,
+    color 140ms ease-out;
+}
+
+.settings-segment:hover {
+  color: var(--ink) !important;
+}
+
+.settings-segment[aria-checked='true'] {
+  background: var(--surface-strong);
+  color: var(--ink) !important;
+  box-shadow:
+    0 1px 3px rgb(0 0 0 / 0.12),
+    0 0 0 0.5px var(--edge-lo);
+}
+
+/* Deslizador */
+.settings-slider input {
+  width: 100%;
+  height: 20px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  cursor: pointer;
+}
+
+.settings-slider input::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--fill) var(--value, 50%), var(--track) var(--value, 50%));
+}
+
+.settings-slider input::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: var(--knob);
+  box-shadow:
+    0 1px 4px rgb(0 0 0 / 0.3),
+    0 0 0 0.5px var(--edge-lo);
+  appearance: none;
+}
+
+[data-theme='dark'] .settings-slider input::-webkit-slider-thumb {
+  background: rgb(255 255 255 / 0.92);
+}
+
+.settings-slider-scale {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+  font-family: var(--font-small);
+  font-size: 10.5px;
+  color: var(--ink-faint);
+}
+
+.settings-footer {
+  margin-top: 12px;
+  text-align: center;
+  font-family: var(--font-small);
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ink-faint);
+}
+
+/* Contraste alto de Windows: controles con colores y bordes del sistema. */
+@media (forced-colors: active) {
+  .settings-card,
+  .settings-group,
+  .settings-keycap,
+  .settings-switch,
+  .settings-segmented {
+    border: 1px solid CanvasText;
+  }
+
+  .settings-switch[aria-checked='true'],
+  .settings-segment[aria-checked='true'] {
+    background: Highlight;
+    color: HighlightText !important;
+  }
+
+  .settings-switch-knob {
+    background: CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-switch-knob,
+  .settings-keycap[data-recording='true'] {
+    transition: none;
+    animation: none;
+  }
+}

@@ -1,0 +1,97 @@
+/*
+ * Sistema visual de EFC: cristal neutro, sin colores de acento.
+ * La tinta y el cristal se invierten según la luminosidad real del fondo (data-theme), de modo que
+ * el texto mantiene el contraste sobre cualquier escritorio.
+ */
+:root {
+  --font-text: 'Segoe UI Variable Text', 'Segoe UI', Inter, system-ui, sans-serif;
+  --font-display: 'Segoe UI Variable Display', 'Segoe UI', Inter, system-ui, sans-serif;
+  --font-small: 'Segoe UI Variable Small', 'Segoe UI', Inter, system-ui, sans-serif;
+  color-scheme: light dark;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  /* Ventanas transparentes: el fondo debe ser transparente. */
+  background: transparent;
+}
+
+body {
+  font-family: var(--font-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  user-select: none;
+  cursor: default;
+}
+
+[data-theme='light'] {
+  --ink: rgb(18 19 23 / 0.9);
+  --ink-soft: rgb(18 19 23 / 0.6);
+  --ink-faint: rgb(18 19 23 / 0.38);
+  /* --glass-factor: transparencia de la rueda elegida en Ajustes (1 = la original). */
+  --glass-tint: rgb(234 235 240 / calc(0.52 * var(--glass-factor, 1)));
+  --glass-tint-solid: rgb(243 243 246 / 0.86);
+  --edge-hi: rgb(255 255 255 / 0.9);
+  --edge-lo: rgb(0 0 0 / 0.14);
+  --surface: rgb(255 255 255 / calc(0.5 * var(--glass-factor, 1)));
+  --surface-strong: rgb(255 255 255 / 0.97);
+  --surface-stroke: rgb(255 255 255 / 0.92);
+  --surface-stroke-strong: rgb(255 255 255 / 1);
+  --surface-lift: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.07));
+  --surface-lift-strong: drop-shadow(0 5px 10px rgb(0 0 0 / 0.16));
+  --well: rgb(0 0 0 / 0.08);
+  --orb-hi: rgb(255 255 255 / 0.98);
+  --orb-lo: rgb(255 255 255 / 0.62);
+  --track: rgb(0 0 0 / 0.1);
+  --fill: rgb(18 19 23 / 0.72);
+  --shadow-color: 0 0 0;
+  --shadow-strength: 0.22;
+  --focus: rgb(18 19 23 / 0.85);
+}
+
+[data-theme='dark'] {
+  --ink: rgb(255 255 255 / 0.95);
+  --ink-soft: rgb(255 255 255 / 0.66);
+  --ink-faint: rgb(255 255 255 / 0.42);
+  --glass-tint: rgb(22 22 26 / calc(0.42 * var(--glass-factor, 1)));
+  --glass-tint-solid: rgb(32 32 36 / 0.86);
+  --edge-hi: rgb(255 255 255 / 0.3);
+  --edge-lo: rgb(0 0 0 / 0.4);
+  --surface: rgb(255 255 255 / calc(0.09 * var(--glass-factor, 1)));
+  --surface-strong: rgb(255 255 255 / 0.25);
+  --surface-stroke: rgb(255 255 255 / 0.16);
+  --surface-stroke-strong: rgb(255 255 255 / 0.46);
+  --surface-lift: none;
+  --surface-lift-strong: drop-shadow(0 5px 12px rgb(0 0 0 / 0.4));
+  --well: rgb(0 0 0 / 0.24);
+  --orb-hi: rgb(255 255 255 / 0.22);
+  --orb-lo: rgb(255 255 255 / 0.06);
+  --track: rgb(255 255 255 / 0.16);
+  --fill: rgb(255 255 255 / 0.85);
+  --shadow-color: 0 0 0;
+  --shadow-strength: 0.5;
+  --focus: rgb(255 255 255 / 0.9);
+}
+
+/* Contraste alto de Windows: colores del sistema y bordes sólidos. */
+@media (forced-colors: active) {
+  [data-theme] {
+    --ink: CanvasText;
+    --ink-soft: CanvasText;
+    --ink-faint: GrayText;
+    --glass-tint: Canvas;
+    --glass-tint-solid: Canvas;
+    --surface: Canvas;
+    --surface-strong: Highlight;
+    --surface-stroke: CanvasText;
+    --surface-stroke-strong: Highlight;
+    --track: GrayText;
+    --fill: Highlight;
+    --focus: Highlight;
+  }
+}

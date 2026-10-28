@@ -1,0 +1,6 @@
+# Saltos de línea tal como están en el proyecto (LF)
+* text=auto eol=lf
+*.exe binary
+*.ttf binary
+*.ico binary
+*.png binary
