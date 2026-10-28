@@ -1,5 +1,7 @@
 # EFC — Easy File Converter
 
+<a href="https://www.paypal.com/donate/?hosted_button_id=FWQZSTKY2Q94E"><img src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" alt="Donate with PayPal" title="PayPal - The safer, easier way to pay online!"></a>
+
 A file converter for Windows that lives in the background. Select a file in File Explorer, press
 **Ctrl + Shift + E**, a glass wheel appears next to the cursor, pick a format and the converted file
 shows up in the same folder. No windows, no dialogs.
