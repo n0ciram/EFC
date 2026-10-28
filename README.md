@@ -13,6 +13,23 @@ shows up in the same folder. No windows, no dialogs.
 - Progress notification with real progress, "N of M processed", cancel and retry.
 - Interface in English and Spanish.
 
+<div id="donate-button-container">
+<div id="donate-button"></div>
+<script src="https://www.paypalobjects.com/donate/sdk/donate-sdk.js" charset="UTF-8"></script>
+<script>
+PayPal.Donation.Button({
+env:'production',
+hosted_button_id:'FWQZSTKY2Q94E',
+image: {
+src:'https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif',
+alt:'Donate with PayPal button',
+title:'PayPal - The safer, easier way to pay online!',
+}
+}).render('#donate-button');
+</script>
+</div>
+
+
 ---
 
 ## 1. Install and try it (no build required)
