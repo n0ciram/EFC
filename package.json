@@ -21,6 +21,7 @@
     "test:unit": "node --import tsx --test --test-reporter=spec \"tests/unit/**/*.test.ts\"",
     "test:conversion": "node --import tsx --test --test-reporter=spec \"tests/conversion/**/*.test.ts\"",
     "test:e2e": "node tests/e2e/run.mjs",
+    "demo:gif": "npm run build && node scripts/demo/record.mjs",
     "prepare:win": "node scripts/prepare-win.mjs",
     "dist": "npm run build && npm run prepare:win && electron-builder --win nsis --x64 --publish never",
     "dist:dir": "npm run build && npm run prepare:win && electron-builder --win dir --x64 --publish never"

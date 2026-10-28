@@ -4,6 +4,8 @@ A file converter for Windows that lives in the background. Select a file in File
 **Ctrl + Shift + E**, a glass wheel appears next to the cursor, pick a format and the converted file
 shows up in the same folder. No windows, no dialogs.
 
+![EFC converting a photo to WEBP and shrinking a PDF from the radial wheel](docs/demo.gif)
+
 - Transparent radial wheel with the real desktop blurred behind it, no accent colours.
 - Real, local conversions: nothing ever leaves your computer.
 - The original is never modified and nothing is overwritten (`photo.jpg` → `photo_converted.jpg` →
@@ -206,6 +208,7 @@ npm run dist         # creates release\EFC-Setup-<version>.exe
 npm run dist:dir     # packaged version without installer (release\win-unpacked\EFC.exe)
 npm run build:helper # rebuilds efc-helper.exe (needs clang or mingw-w64)
 npm run prepare:win  # prepares the Windows binaries and downloads FFmpeg (dist does this)
+npm run demo:gif     # records docs/demo.gif with the real app (don't touch the mouse meanwhile)
 ```
 
 Notes:
